@@ -1,0 +1,19 @@
+grab the term under the cursor, store in "U yiW
+collapse todo
+yank it into "E
+is the term a context?
+    goto ,CONTEXT
+is the term a project?
+    goto ,PROJECTS
+mark our place as MM
+grab the top lines from this section
+are any of them the same as the term in "U?
+    goto that line
+else:
+    goto MM
+    paste \t followed by "U
+paste "E
+collapse todo
+shift it one right
+
+

@@ -1,0 +1,64 @@
+#!/usr/bin/python
+""" timesink.py
+
+Logs every time you switch from one application to another.
+Needs a window manager that uses the freedesktop standards. I think.
+
+"""
+
+__version__ = "$Revision$"
+__author__ = "Danny O'Brien <http://www.spesh.com/danny/>"
+__copyright__ = "Copyright 2003, Danny O'Brien"
+__contributors__ = None
+__license__ = "Python"
+__history__ = """
+"""
+import Xlib.display
+from Xlib.X import *
+import datetime
+
+class BadEventException(Exception):
+    pass
+
+class AtomWatcher:
+    def __init__(self, display, window, atom):
+        self.d = display
+        self.w = window
+        if isinstance(atom, str):
+            self.a = self.d.intern_atom(atom, only_if_exists = True)
+        else:
+            self.a = atom
+        self.w.change_attributes( event_mask = PropertyChangeMask)
+        self.update_value()
+
+    def get_value(self):
+        return self.value
+
+    def update_value(self):
+        v = self.w.get_full_property(self.a, AnyPropertyType).value
+        self.value = v[0]
+
+    def handle_event(self, event):
+        if not isinstance(event, Xlib.protocol.event.PropertyNotify):
+            raise BadEventException
+        if event.atom != self.a:
+            return
+        self.update_value()
+
+    def loop(self):
+        event = self.d.next_event()
+        self.handle_event(event)
+
+def main(args):
+    d=Xlib.display.Display()
+    r = d.screen().root
+    m = AtomWatcher(d, r, '_NET_ACTIVE_WINDOW')
+    while 1:
+        old = m.value
+        m.loop()
+        if m.value != 0 and m.value != old:
+            active = d.create_resource_object('window', m.value)
+            print datetime.datetime.now().isoformat(), active.get_wm_class()[0]
+
+if __name__ == '__main__':
+    main(None)
