@@ -415,18 +415,9 @@ class Todo:
     def score(self, target_tags):
        return len(set(self.tags()).intersection(target_tags))
 
-class TodoList:
+class TodoListAbstract:
     def __init__(self, l=None):
-        try:
-            if l == None:
-                l = vimhelper.VimBuffer('TODO', 'todo.txt')
-            if isinstance(l, vimhelper.VimBuffer) or isinstance(l, list):
-                self.contents = l
-        except vimhelper.VimBufferNotFound:
-            l=file(os.path.expanduser('~/todo.txt'),'r')
-        if isinstance(l, file):
-            self.contents = [i.rstrip() for i in l.readlines()]
-
+        raise Exception, "Abstract Class Called!"
 
     def parse_todos(self):
         r""" Find all todos in the todolist
@@ -536,6 +527,22 @@ class TodoList:
     def get_all_todos(self):
         self.parse_todos()
         return self.todos
+
+def DefaultTodoList(l= None):
+    return TodoList(l)
+        
+class TodoList(TodoListAbstract):
+    def __init__(self, l=None):
+        try:
+            if l == None:
+                l = vimhelper.VimBuffer('TODO', 'todo.txt')
+            if isinstance(l, vimhelper.VimBuffer) or isinstance(l, list):
+                self.contents = l
+        except vimhelper.VimBufferNotFound:
+            l=file(os.path.expanduser('~/todo.txt'),'r')
+        if isinstance(l, file):
+            self.contents = [i.rstrip() for i in l.readlines()]
+
 
 def main(args):
     """ Put your main command line runner here """

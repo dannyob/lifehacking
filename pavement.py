@@ -108,7 +108,7 @@ def todolist():
     """ Scan todo.txt """
     pr = DEFAULT_PRIORITY
     tags = get_tags()
-    t = todo.TodoList().top_todo(tags)
+    t = todo.DefaultTodoList().top_todo(tags)
     if t == None:
        return
     if '@URGENT' in str(t):
@@ -175,7 +175,7 @@ def split():
     """ Splits the current task into two """
     subtask = " ".join(options.args)
     tags = get_tags()
-    t =  todo.TodoList()
+    t =  todo.DefaultTodoList()
     toptodo = t.top_todo(tags)
     if not toptodo:
         print "Don't know current task!"
@@ -201,7 +201,7 @@ def split():
 @task
 def done():
     """ Marks current task as done """
-    t = todo.TodoList()
+    t = todo.DefaultTodoList()
     t.mark_current_done()
 
 @task
@@ -229,16 +229,16 @@ def filter_tags(f, tags):
 @task
 def listcontexts():
     """ List all contexts in todo list """
-    print '\n'.join(filter_tags('CONTEXT', todo.TodoList().get_all_tags() ))
+    print '\n'.join(filter_tags('CONTEXT', todo.DefaultTodoList().get_all_tags() ))
  
 @task
 def listprojects():
     """ List all projects in todo list """
-    print '\n'.join(filter_tags('PROJECT', todo.TodoList().get_all_tags() ))
+    print '\n'.join(filter_tags('PROJECT', todo.DefaultTodoList().get_all_tags() ))
 
 @task
 def listtodos():
-    z= todo.TodoList().get_all_todos()
+    z= todo.DefaultTodoList().get_all_todos()
     for i in z:
         print i, i.score(get_tags())
     print
@@ -250,7 +250,7 @@ def randomproject():
     """ Settle on a random project """
     random.seed()
     tags = filter_tags('CONTEXT', get_tags()) # filter out projects
-    project_tag = random.choice(filter_tags('PROJECT', todo.TodoList().get_all_tags() )) # random pick from all projects
+    project_tag = random.choice(filter_tags('PROJECT', todo.DefaultTodoList().get_all_tags() )) # random pick from all projects
     tags = tags + [ project_tag ]
     print "Tags changed from ", get_tags(), " to ", tags
     set_tags(tags)
