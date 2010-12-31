@@ -528,21 +528,31 @@ class TodoListAbstract:
         self.parse_todos()
         return self.todos
 
-def DefaultTodoList(l= None):
-    return TodoList(l)
-        
-class TodoList(TodoListAbstract):
+def DefaultTodoList():
+    try:
+        return TodoListVim()
+    except vimhelper.VimBufferNotFound:
+        return TodoListFile()
+    
+class TodoListVim(TodoListAbstract):
     def __init__(self, l=None):
-        try:
-            if l == None:
-                l = vimhelper.VimBuffer('TODO', 'todo.txt')
-            if isinstance(l, vimhelper.VimBuffer) or isinstance(l, list):
-                self.contents = l
-        except vimhelper.VimBufferNotFound:
-            l=file(os.path.expanduser('~/todo.txt'),'r')
-        if isinstance(l, file):
-            self.contents = [i.rstrip() for i in l.readlines()]
+        if l == None:
+            vb = vimhelper.VimBuffer('TODO', 'todo.txt')
+        else:
+            raise Exception, "Don't know how to open specific Vim instances yet"
+        self.contents = vb
 
+    def sync(self):
+        pass
+
+class TodoListFile(TodoListAbstract):
+    def __init__(self, l="~/todo.txt"):
+        self.filename = os.path.expanduser(l)
+        f=file(self.filename,'r')
+        self.contents = [i.rstrip() for i in f.readlines()]
+
+    def sync(self):
+        raise Exception, "Don't know how to sync files yet"
 
 def main(args):
     """ Put your main command line runner here """
@@ -625,4 +635,3 @@ class Main():
 
 if __name__ == "__main__":
     sys.exit(Main().run(main) or 0)
-
