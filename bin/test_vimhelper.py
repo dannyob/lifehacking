@@ -49,11 +49,17 @@ class TestVimBuffer(unittest.TestCase):
         self.assertEquals(v[3], '3')
         c = ['0','1','2','3','4','5','6']
         self.assert_(list_compare(v,c))
+        c[3:3] = ['goodness','gracious']
+        v[3:3] = ['goodness','gracious']
+        self.assert_(list_compare(v,c))
         c[1] = 'not 1'
         v[1] = 'not 1'
         self.assert_(list_compare(v,c))
-        c[1:1] = ['expand','me']
-        v[1:1] = ['expand','me']
+        c[1:2] = ['expand','me']
+        v[1:2] = ['expand','me']
+        self.assert_(list_compare(v,c))
+        c[-1:] = ['last','thing']
+        v[-1:] = ['last','thing']
         self.assert_(list_compare(v,c))
 
     def tearDown(self):
