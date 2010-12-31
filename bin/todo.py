@@ -415,9 +415,11 @@ class Todo:
     def score(self, target_tags):
        return len(set(self.tags()).intersection(target_tags))
 
-class TodoListAbstract:
-    def __init__(self, l=None):
-        raise Exception, "Abstract Class Called!"
+class TodoList:
+    def __init__(self, l = None):
+        if not l or not isinstance(l, list):
+            raise Exception, "TodoList needs a list"
+        self.contents = l
 
     def parse_todos(self):
         r""" Find all todos in the todolist
@@ -528,13 +530,7 @@ class TodoListAbstract:
         self.parse_todos()
         return self.todos
 
-def DefaultTodoList():
-    try:
-        return TodoListVim()
-    except vimhelper.VimBufferNotFound:
-        return TodoListFile()
-    
-class TodoListVim(TodoListAbstract):
+class TodoListVim(TodoList):
     def __init__(self, l=None):
         if l == None:
             vb = vimhelper.VimBuffer('TODO', 'todo.txt')
@@ -542,18 +538,18 @@ class TodoListVim(TodoListAbstract):
             raise Exception, "Don't know how to open specific Vim instances yet"
         self.contents = vb
 
-    def sync(self):
-        pass
-
-class TodoListFile(TodoListAbstract):
+class TodoListFile(TodoList):
     def __init__(self, l="~/todo.txt"):
         self.filename = os.path.expanduser(l)
         f=file(self.filename,'r')
         self.contents = [i.rstrip() for i in f.readlines()]
 
-    def sync(self):
-        raise Exception, "Don't know how to sync files yet"
-
+def DefaultTodoList():
+    try:
+        return TodoListVim()
+    except vimhelper.VimBufferNotFound:
+        return TodoListFile()
+ 
 def main(args):
     """ Put your main command line runner here """
     pass
