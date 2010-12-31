@@ -491,11 +491,29 @@ class TodoList:
         return best_bet
 
     def split_todo(self, original, addition):
+        r"""
+        >>> i = TodoList([',INBOX','\tmust do X','\tmust do Y @CURRENT', ',CONTEXTS', '\t#FRED', '\t\tdo another thing @FOO'])
+        >>> i.split_todo(i.current_todo(), '\tthen do Z')
+        >>> j = i.contents
+        >>> j[1]
+        '\tmust do X'
+        >>> j[2]
+        '\tmust do Y @CURRENT'
+        >>> j[3]
+        '\tthen do Z'
+        >>> j[4]
+        ',CONTEXTS'
+        """
         """ Given an original todo, insert a new one underneath it """
         self.contents[original.linenum:original.linenum] = [str(original), str(addition)]
         self.sync()
 
     def current_todo(self):
+        r"""
+        >>> i = TodoList([',INBOX','\tmust do X @CURRENT','\tmust do Y', ',CONTEXTS', '\t#FRED', '\t\tdo another thing @FOO'])
+        >>> 'must do X' in str(i.current_todo())
+        True
+        """
         self.parse_todos()
         ct = self.tags.setdefault(Tag.current_tag(), [])
         if not ct:
@@ -505,6 +523,16 @@ class TodoList:
         return ct[0]
 
     def mark_current_done(self):
+        r"""
+        >>> i = TodoList([',INBOX','\tmust do X @CURRENT','\tmust do Y', ',CONTEXTS', '\t#FRED', '\t\tdo another thing @FOO'])
+        >>> i.mark_current_done()
+        >>> i.contents[0:3] 
+        [',INBOX', '\tmust do Y', ',CONTEXTS']
+        >>> 'must do X' in i.contents[-1]
+        True
+        >>> '@CURRENT' not in i.contents[-1]
+        False
+        """
         current_todo = self.current_todo()
         l = current_todo.linenum
         current_todo.unset_current() # remove current tag
@@ -534,7 +562,7 @@ class TodoList:
         return self.todos
 
     def sync(self):
-        print "Syncing!"
+        pass
 
 class TodoListVim(TodoList):
     def __init__(self, l=None):
