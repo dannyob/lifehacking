@@ -505,7 +505,7 @@ class TodoList:
         ',CONTEXTS'
         """
         """ Given an original todo, insert a new one underneath it """
-        self.contents[original.linenum:original.linenum] = [str(original), str(addition)]
+        self.contents[original.linenum:original.linenum+1] = [str(original), str(addition)]
         self.sync()
 
     def current_todo(self):
@@ -547,7 +547,8 @@ class TodoList:
             self.sync()
         else:
             # remove entry from current position
-            self.contents[l:l+1] = [self.contents[l+1]]
+            # FIXME deal with multi-line todos
+            self.contents[l:l+2] = [self.contents[l+1]]
             # put timestamped copy at end of file
             done = "\t"+datetime.datetime.now().isoformat() + " " + done
             self.contents[-1:] = [self.contents[-1], done ]
