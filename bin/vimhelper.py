@@ -17,8 +17,8 @@ __cvsversion__ = "$Revision$"
 __date__ = "$Date$"
 
 import logging
-#rootLogger = logging.getLogger('')
-#rootLogger.setLevel(logging.DEBUG)
+rootLogger = logging.getLogger('')
+rootLogger.setLevel(logging.DEBUG)
 
 from subprocess import Popen, PIPE
 class _VimCaller:
@@ -68,6 +68,14 @@ class VimBufferNotFound(Exception):
     pass
 
 class VimBuffer():
+    def __repr__(self):
+        s = 'VimBuffer(%s,%s): [' % (self.server, self.buffer)
+        if self.__len__()==0:
+            return s+']'
+        for i in self:
+            s += repr(i)+", "
+        return s[0:-2]+"]"
+
     def __init__(self, server, buffername):
         self.server = server
         self.buffer = buffername
@@ -77,7 +85,6 @@ class VimBuffer():
         except ValueError:
             raise VimBufferNotFound("Could not find " + self.buffer)
         
-
     def __getitem__(self, n):
         if isinstance(n, slice):
             return self.vimp.getline(n.start+1, n.stop+1).split('\n')
