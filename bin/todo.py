@@ -10,7 +10,7 @@ import random
 import re 
 import subprocess
 import sys, getopt
-import os.path
+import os, os.path
 
 import vimhelper
 import dateutil.rrule
@@ -254,7 +254,6 @@ def indent_count(s):
     """
     return len(s) - len(s.lstrip('\t'))
 
-
 class TodoError(Exception):
     pass
 
@@ -488,11 +487,13 @@ class TodoList:
         if not best_bet:
             best_bet = random.choice(self.todos)
         self.contents[best_bet.linenum] += ' ' + Tag.current_tag()
+        self.sync()
         return best_bet
 
     def split_todo(self, original, addition):
         """ Given an original todo, insert a new one underneath it """
         self.contents[original.linenum:original.linenum] = [str(original), str(addition)]
+        self.sync()
 
     def current_todo(self):
         self.parse_todos()
@@ -515,12 +516,14 @@ class TodoList:
             ignore_tag = repeat_tag[0].ignore_from_repeat(datetime.datetime.now())
             current_todo.add_tag(ignore_tag)
             self.contents[current_todo.linenum] = str(current_todo)
+            self.sync()
         else:
             # remove entry from current position
             self.contents[l:l+1] = [self.contents[l+1]]
             # put timestamped copy at end of file
             done = "\t"+datetime.datetime.now().isoformat() + " " + done
             self.contents[-1:] = [self.contents[-1], done ]
+            self.sync()
 
     def get_all_tags(self):
         self.parse_todos()
@@ -529,6 +532,9 @@ class TodoList:
     def get_all_todos(self):
         self.parse_todos()
         return self.todos
+
+    def sync(self):
+        print "Syncing!"
 
 class TodoListVim(TodoList):
     def __init__(self, l=None):
@@ -543,6 +549,19 @@ class TodoListFile(TodoList):
         self.filename = os.path.expanduser(l)
         f=file(self.filename,'r')
         self.contents = [i.rstrip() for i in f.readlines()]
+
+    def sync(self):
+        print("Syncing " + self.filename)
+        filename = self.filename
+        if os.path.islink(filename):
+            linkname = os.readlink(filename)
+            filename = os.path.join(os.path.dirname(self.filename),linkname)
+        filename_tmp = filename+"~"
+        # when this screws up, you should probably add some file locking
+        f=open(filename_tmp, 'w')
+        f.writelines([i+'\n' for i in self.contents])
+        f.close()
+        os.rename(filename_tmp, filename)
 
 def DefaultTodoList():
     try:
