@@ -99,11 +99,14 @@ class VimBuffer():
     def replace(self, start, stop, value):
         # FIXME right now this assumes that autoindent is ON
         # (the '!' in 'change!' means 'toggle autoindent'
-        realstart = str(start +1)
-        realstop = str(stop +1)
+        realstart = str(start+1)
+        realstop = str(stop)
         if stop >= 2147483646:
             realstop = "$"
-        self.vimp.sendkeys('<Esc>:%s,%s change!\n' % (realstart,realstop) )
+        if start == stop:
+            self.vimp.sendkeys('<Esc>:%s,%s insert!\n' % (realstart,realstart) )
+        else:
+            self.vimp.sendkeys('<Esc>:%s,%s change!\n' % (realstart,realstop) )
         for l in value:
             self.vimp.sendkeys(l+'\n')
         self.vimp.sendkeys('.\n')
