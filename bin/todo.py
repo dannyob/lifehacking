@@ -6,6 +6,7 @@
 
 """
 import datetime
+import time
 import random
 import re 
 import subprocess
@@ -550,7 +551,10 @@ class TodoList:
             # FIXME deal with multi-line todos
             self.contents[l:l+2] = [self.contents[l+1]]
             # put timestamped copy at end of file
-            done = "\t"+datetime.datetime.now().isoformat() + " " + done
+            now = time.localtime()
+            # there's a race condition here at 23:59:59 on a timezone change day!
+            now = time.strftime('%Y-%m-%dT%H:%M-%%02d00') % (time.timezone/(3600))
+            done = '\t'+now+" " + done.lstrip()
             self.contents[-1:] = [self.contents[-1], done ]
             self.sync()
 
