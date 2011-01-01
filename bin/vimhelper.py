@@ -17,8 +17,8 @@ __cvsversion__ = "$Revision$"
 __date__ = "$Date$"
 
 import logging
-rootLogger = logging.getLogger('')
-rootLogger.setLevel(logging.DEBUG)
+#rootLogger = logging.getLogger('')
+#rootLogger.setLevel(logging.DEBUG)
 
 from subprocess import Popen, PIPE
 class _VimCaller:
