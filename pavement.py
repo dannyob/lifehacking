@@ -81,6 +81,7 @@ def set_order(o):
 
 
 @task
+@needs('bedtime')
 @needs('testtask')
 @needs('todolist')
 @needs('unreadmail')
@@ -118,6 +119,14 @@ import re
 inbox = os.path.expanduser('~/Mail/current/spool/')
 if not os.path.exists(inbox):
     inbox = None
+
+@task
+def bedtime():
+    """ Stop myself working all night """
+    n = datetime.datetime.now()
+
+    if n.hour > 22 or n.hour < 8:
+        set_order(Order('Sleeeeeeeeeeeep is gooooooooooood', priority=TOP_PRIORITY))
 
 @task
 def unreadmail():
