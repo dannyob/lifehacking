@@ -14,7 +14,6 @@ __url__ = "http://www.oblomovka.com/public/lifehacking/pavement.py"
 __license__ = "GPL"
 
 import os.path
-import sys
 
 import todo
 import datetime
@@ -88,8 +87,8 @@ def set_order(o):
 @needs('autocontext')
 def now():
     """ Tell Danny what to do """
-    announce= str(datetime.datetime.now()) + "::" + str(options.human.order).lstrip()
-    print announce
+    announce= todo.timestamp() + " " + str(options.human.order).lstrip()
+    print(announce)
     store_setting('last_order', str(options.human.order))
 
 @task
