@@ -40,7 +40,7 @@ class Tag(str):
     >>> print i.is_project()
     False
     >>> print i.argument()
-    yip
+    ['yip']
     >>> print i
     @POOT(yip)
     >>> print i.name()
@@ -77,7 +77,7 @@ class Tag(str):
         >>> print m
         ['@FOO', '#BAR', '@BING', '@BLAH(54 54)', '@BOO(12 13)']
         >>> m[-1].argument()
-        '12 13'
+        ['12 13']
         """
         l = []
         for i in re.finditer(Tag.tag_regexp, s):
@@ -98,10 +98,16 @@ class Tag(str):
         >>> i = Tag.repeat_tag('YEARLY')
         >>> print i.ignore_from_repeat(datetime.datetime(year=1990, day=1, month=1))
         @IGNOREUNTIL(1991-01-01T00:00)
+        >>> i = Tag.repeat_tag('HOURLY,interval=2')
+        >>> print i.ignore_from_repeat(datetime.datetime(year=1990, day=1, month=1))
+        @IGNOREUNTIL(1990-01-01T02:00)
         """
-        repeat_rule = dateutil.rrule.rrule(eval(self.argument(),
-                                                dateutil.rrule.__dict__),
-                                           dtstart=now)
+        repeat_args = [ i.split('=') for i in self.argument()[1:]]
+        repeat_dict = dict([ (i, eval(j, {}, {}) ) for (i,j) in repeat_args ])
+        repeat_dict['dtstart'] = now
+        repeat_rule = dateutil.rrule.rrule(eval(self.argument()[0],
+                                                dateutil.rrule.__dict__, {}),
+                                           **repeat_dict)
         return Tag.ignore_tag(repeat_rule.after(now))
      
     def parse_argument(self):
@@ -109,7 +115,7 @@ class Tag(str):
             m = re.match(Tag.tag_regexp, self)
             if not m:
                 return None
-            self.args = m.group('arg')
+            self.args = m.group('arg').split(',')
             return self.args
 
     def is_project(self):
@@ -413,7 +419,7 @@ class Todo:
         if len(m) != 1:
             raise TodoError("Too many ignore tags")
         t = m[0]
-        return datetime.datetime.strptime(t.argument(), '%Y-%m-%dT%H:%M') # Move to subclass of Tag?
+        return datetime.datetime.strptime(t.argument()[0], '%Y-%m-%dT%H:%M') # Move to subclass of Tag?
 
     def score(self, target_tags):
        return len(set(self.tags()).intersection(target_tags))
