@@ -190,8 +190,8 @@ def split():
     print "Splitting ",toptodo
     todo_tags = todo.Tag.extract_tags(str(toptodo)) 
     if todo.Tag.current_tag() not in todo_tags: 
+        raise Exception, "Where is current tag?"
         todo_tags += [todo.Tag.current_tag()]
-    print todo.indent_count(str(toptodo))
     subtask += ' ' + ' '.join(todo_tags)
     subtask = '\t' * todo.indent_count(str(toptodo)) + subtask
     toptodo.unset_current()

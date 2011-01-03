@@ -25,7 +25,6 @@ def main(args):
     if len(args) == 0:
         args = ['now']
     pavement_dir = os.path.join(metautils.root(__file__))
-    print pavement_dir
     os.chdir(pavement_dir)
     subprocess.call(['paver'] + args)
 
