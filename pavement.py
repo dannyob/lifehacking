@@ -26,12 +26,12 @@ MEDIUM_PRIORITY = 75
 TOP_PRIORITY = 100
 TWEAK_PRIORITY = 10 # tweaking up or down
 
-private_store = os.path.expanduser('~/private/lifehacking/')
+private_store = os.path.expanduser('~/Private/lifehacking/')
 if not os.path.exists(private_store):
     os.makedirs(private_store)
 
 def store_setting(key, value):
-    f = file(os.path.expanduser('~/private/lifehacking/'+key),'w')
+    f = file(os.path.expanduser('~/Private/lifehacking/'+key),'w')
     print >>f, value
     f.close()
 
@@ -44,7 +44,7 @@ def get_setting(key):
     None
     """
     try:
-        f = file(os.path.expanduser('~/private/lifehacking/'+key),'r')
+        f = file(os.path.expanduser('~/Private/lifehacking/'+key),'r')
         i = f.read().rstrip()
         f.close()
         return i
