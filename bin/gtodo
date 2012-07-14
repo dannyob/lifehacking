@@ -29,7 +29,7 @@ class TodoOSD:
     def inc_timer(self):
         self.timer -= 1
         if self.timer <= 0:
-            sys.stop()
+            sys.exit()
         self.set_message(str(self.timer // 60)  + " " + self.text)
         self.todo_timer()
 
