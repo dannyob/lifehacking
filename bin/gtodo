@@ -116,7 +116,8 @@ class TodoOSD:
         bg_gc = gdk.GC(bitmap)
         fg_gc.set_foreground(gdk.Color(pixel=-1))
         bg_gc.set_background(gdk.Color(pixel=0))
-
+        fg_gc.set_colormap(gdk.colormap_get_system())
+        bg_gc.set_colormap(gdk.colormap_get_system())
         if fake_translucent_bg:
             w, h = 2, 2
             stipple = gtk.gdk.Pixmap(None, w, h, 1)
