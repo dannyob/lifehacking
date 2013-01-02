@@ -116,7 +116,7 @@ def todolist():
     set_order(Order(t,'','todo_top_split', priority=pr))
 
 import re
-inbox = os.path.expanduser('~/Mail/current/spool/')
+inbox = os.environ['MAILDIR']
 if not os.path.exists(inbox):
     inbox = None
 
@@ -131,12 +131,17 @@ def bedtime():
 @task
 def unreadmail():
     """ Pluck out unread mail """
+    global inbox
     if not inbox:
         return
+    inbox="notmuch"
     inbox_zero_plus = 70
     inbox_zero_toomuch = 100
     inbox_chance = 0.2 # 1 in 5 tasks should be answering email
     import mailbox
+    if inbox=="notmuch":
+        os.system('notmuch-mutt search "tag:flagged OR (tag:inbox AND tag:recently AND NOT tag:archive AND NOT tag:lists)" > /dev/null 2>&1')
+        inbox=os.path.expanduser("~/.cache/notmuch/mutt/results")
     m = mailbox.Maildir(inbox)
     if len(m) == 0:
         return
@@ -153,6 +158,7 @@ def unreadmail():
     mail = m[mail_key]
     topmail=file(os.path.expanduser('~/.topmail'),'w')
     message_id = mail['message-id']
+    message_id = re.sub(r'[<>]','', message_id)
     message_id = re.sub(r'\]|\[|\*|\.|\+|\$','.', message_id)
     print >>topmail, message_id
     set_order( Order('Deal with mail from %s about %s' % (mail['From'], mail['Subject']), 'tm', priority=pr) )
