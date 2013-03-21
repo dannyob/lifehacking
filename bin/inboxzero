@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+##
+# inboxzero.py
+###
+"""inboxzero.py
+
+#provides osd current_email_counter for going through lots of email 
+"""
+
+__author__ = "Danny O'Brien <http://www.spesh.com/danny/>"
+__copyright__ = "Copyright Danny O'Brien"
+__contributors__ = None
+__license__ = "GPL v3"
+
+import subprocess
+import time
+import datetime
+import sys
+
+
+unread_command = 'unread' # eg, 'notmuch count tag:inbox'
+
+finish_time = datetime.datetime.strptime(sys.argv[1], "%Y-%m-%d %H:%M")
+
+
+def say(s):
+    subprocess.call(["/usr/bin/gnome-osd-client", s])
+
+
+def unread_emails():
+        return int(subprocess.Popen([unread_command], shell=True, stdout=subprocess.PIPE).communicate()[0])
+
+old_email_count = 0
+average_sum = 0
+average_count = 0
+seconds_for_this_mail = 0
+average = 30
+
+while(1):
+    current_email_count = unread_emails()
+    if current_email_count != old_email_count:
+        old_email_count = current_email_count
+        last_mail_time = datetime.datetime.now()
+        average_sum = average_sum + seconds_for_this_mail
+        average_count += 1
+        average = average_sum / average_count
+        if average == 0:
+            average = 30
+
+    seconds_per_mail = ((finish_time - datetime.datetime.now()).total_seconds() / current_email_count)
+    seconds_for_this_mail = (datetime.datetime.now() - last_mail_time).total_seconds()
+
+    mails_at_this_rate = (finish_time - datetime.datetime.now()).total_seconds() / average
+
+    say("togo(%d) permail(%d) thismail(%d) atthisrate(%d) average(%d)" % (current_email_count, int(seconds_per_mail),
+        int(seconds_for_this_mail), int(mails_at_this_rate), average))
+    time.sleep(5)
