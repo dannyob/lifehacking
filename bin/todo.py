@@ -518,6 +518,28 @@ class TodoList:
         self.contents[original.linenum:original.linenum+1] = [str(original), str(addition)]
         self.sync()
 
+    def add_new_todo(self, newtodo):
+        r"""
+        >>> i = TodoList([',INBOX','\tmust do X','\tmust do Y @CURRENT', ',CONTEXTS', '\t#FRED', '\t\tdo another thing @FOO'])
+        >>> i.add_new_todo("Hello")
+        True
+        >>> j = i.contents
+        >>> j[0]
+        ',INBOX'
+        >>> j[1]
+        '\tHello'
+        >>> j[2]
+        '\tmust do X'
+        """
+        for l in range(0, len(self.contents)):
+            if self.contents[l].strip() == ',INBOX':
+                num_tabs = indent_count(self.contents[l]) + 1
+                indented_todo = '\t' * num_tabs + newtodo
+                self.contents[l:l + 1] = [',INBOX', indented_todo]
+                self.sync()
+                return True
+        return False
+
     def current_todo(self):
         r"""
         >>> i = TodoList([',INBOX','\tmust do X @CURRENT','\tmust do Y', ',CONTEXTS', '\t#FRED', '\t\tdo another thing @FOO'])
