@@ -20,7 +20,11 @@ import sys
 
 unread_command = 'unread' # eg, 'notmuch count tag:inbox'
 
-finish_time = datetime.datetime.strptime(sys.argv[1], "%Y-%m-%d %H:%M")
+try:
+    finish_time = datetime.datetime.strptime(sys.argv[1], "%Y-%m-%d %H:%M")
+except ValueError:
+    finish_time = datetime.datetime.strptime(str(datetime.datetime.today())[:11]+sys.argv[1], "%Y-%m-%d %H:%M")
+
 
 
 def say(s):
