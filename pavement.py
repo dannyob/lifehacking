@@ -185,6 +185,17 @@ def context():
 
 @task
 @consume_args
+def add():
+    """ Add a new todo """
+    newtodo = " ".join(options.args)
+    t = todo.DefaultTodoList()
+    if t.add_new_todo(newtodo):
+        print "Added ", newtodo
+    else:
+        print "Could not add it!"
+
+@task
+@consume_args
 def split():
     """ Splits the current task into two """
     subtask = " ".join(options.args)
@@ -217,6 +228,15 @@ def done():
     """ Marks current task as done """
     t = todo.DefaultTodoList()
     t.mark_current_done()
+
+@task
+@consume_args
+def log():
+    """ Timestamps and logs a task as done """
+    tolog = " ".join(options.args)
+    t = todo.DefaultTodoList()
+    t.timestamped_append_to_bottom(tolog)
+    print "Logged!"
 
 @task
 def autocontext():

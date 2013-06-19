@@ -554,6 +554,11 @@ class TodoList:
             raise TodoError, "More than one current todos! Ulp!"
         return ct[0]
 
+    def timestamped_append_to_bottom(self, l):
+        l2 = '\t'+timestamp()+" " + l.lstrip()
+        self.contents[-1:] = [self.contents[-1], l2 ]
+        self.sync()
+
     def mark_current_done(self):
         r"""
         >>> i = TodoList([',INBOX','\tmust do X @CURRENT','\tmust do Y', ',CONTEXTS', '\t#FRED', '\t\tdo another thing @FOO'])
@@ -582,9 +587,7 @@ class TodoList:
             # FIXME deal with multi-line todos
             self.contents[l:l+2] = [self.contents[l+1]]
             # put timestamped copy at end of file
-            done = '\t'+timestamp()+" " + done.lstrip()
-            self.contents[-1:] = [self.contents[-1], done ]
-            self.sync()
+            self.timestamped_append_to_bottom(done)
 
     def get_all_tags(self):
         self.parse_todos()
