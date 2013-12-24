@@ -159,7 +159,6 @@ def unreadmail():
     topmail=file(os.path.expanduser('~/.topmail'),'w')
     message_id = mail['message-id']
     message_id = re.sub(r'[<>]','', message_id)
-    message_id = re.sub(r'\]|\[|\*|\.|\+|\$','.', message_id)
     print >>topmail, message_id
     set_order( Order('Deal with mail from %s about %s' % (mail['From'], mail['Subject']), 'tm', priority=pr) )
 
