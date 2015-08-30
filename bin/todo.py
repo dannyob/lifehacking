@@ -389,8 +389,8 @@ class Todo:
         try:
             self.remove_tag(Tag.current_tag())
         except TodoError:
-            pass
-        return 
+            print "Could not remove current tag"
+        return
 
     def remove_tags_if(self, l):
         r""" remove tags if lambda(tag) is true 
